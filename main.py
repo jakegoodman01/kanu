@@ -7,7 +7,7 @@ class Element:
     def __init__(self, value: str):
         elem = Element.separate_coefficient(value)
         self.coefficient = int(elem[0])
-        self.variable = elem[1]
+        self.variable = Variable(elem[1])
 
     def __repr__(self):
         if self.variable is None:
@@ -49,13 +49,37 @@ class Element:
                     return f'{e[0]}1', e[i:]
                 return e[:i], e[i:]
 
-        # if the for loop completes, there was no variable in e
+        # If the for loop completes, there was no variable in e
         return e, None
 
 
 class Variable:
     def __init__(self, name: str):
         self.name = name
+        self._parse_variable(name)
+
+    def __repr__(self):
+        if self.name is None:
+            return ''
+        return self.name
+
+    def _parse_variable(self, name: str):
+        if name is None:
+            self.components = None
+        else:
+            self.components = []  # Contains the number of variables in the name. For example: a^2b -> [a, a, b]
+            curr_var = name[0]
+            check_exponent = False
+            for i in range(1, len(name)):
+                if check_exponent:
+                    power = int(name[i])
+                    self.components.extend([curr_var for j in range(power)])
+                    check_exponent = False
+                elif name[i] == '^':
+                    check_exponent = True
+                else:
+                    self.components.append(curr_var)
+                    curr_var = name[i]
 
 
 class Expression:
@@ -84,9 +108,3 @@ class Expression:
                     else:
                         self.elements.append(Element(exp[begin:i]))
                     begin = i
-
-
-ex = Expression('-2 + 10a * 6a + 2 / 9')
-print(ex.elements)
-# for e in ex.elements:
-#     print(f'{e} -> {type(e)}')
