@@ -56,6 +56,7 @@ class Element:
 class Variable:
     def __init__(self, name: str):
         self.name = name
+        self.components = None
         self._parse_variable(name)
 
     def __repr__(self):
@@ -64,22 +65,29 @@ class Variable:
         return self.name
 
     def _parse_variable(self, name: str):
-        if name is None:
-            self.components = None
-        else:
+        if name is not None:
+            name += 'z'  # not part of the variable name, just so the loop can execute once more
             self.components = []  # Contains the number of variables in the name. For example: a^2b -> [a, a, b]
             curr_var = name[0]
             check_exponent = False
-            for i in range(1, len(name)):
-                if check_exponent:
-                    power = int(name[i])
-                    self.components.extend([curr_var for j in range(power)])
-                    check_exponent = False
-                elif name[i] == '^':
-                    check_exponent = True
-                else:
-                    self.components.append(curr_var)
-                    curr_var = name[i]
+            power = None
+            if len(name) == 1:
+                self.components.append(curr_var)
+            else:
+                for i in range(1, len(name)):
+                    if check_exponent:
+                        power = int(name[i])
+                        check_exponent = False
+                    elif name[i] == '^':
+                        check_exponent = True
+                    else:
+                        #  this code is run when a new letter has been read
+                        if power is None:
+                            self.components.append(curr_var)
+                        else:
+                            self.components.extend([curr_var for j in range(power)])
+                            power = None
+                        curr_var = name[i]
 
 
 class Expression:
@@ -108,3 +116,11 @@ class Expression:
                     else:
                         self.elements.append(Element(exp[begin:i]))
                     begin = i
+
+
+# ex = Expression('-2 + 10a^2 * 6a + 2 / 9')
+# print(ex.elements)
+# for e in ex.elements:
+#     print(f'{e} -> {type(e)}')
+first = Element('ab^2')
+print(first.variable.components)
