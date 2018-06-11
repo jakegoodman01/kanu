@@ -33,12 +33,6 @@ class Element:
             # TODO: Implement applying * and / operators onto Elements
             pass
 
-    def add(self, elem):
-        if self.variable == elem.variable:
-            self.coefficient += elem.coefficient
-        else:
-            raise ValueError('Cannot add or subtract elements of different terms')
-
     @classmethod
     def separate_coefficient(cls, e) -> tuple:
         for i in range(len(e)):
@@ -48,9 +42,14 @@ class Element:
                 if i == 1 and not e[0].isdigit():
                     return f'{e[0]}1', e[i:]
                 return e[:i], e[i:]
-
         # If the for loop completes, there was no variable in e
         return e, None
+
+    def add(self, elem):
+        if self.variable == elem.variable:
+            self.coefficient += elem.coefficient
+        else:
+            raise ValueError('Cannot add or subtract elements of different terms')
 
 
 class Variable:
@@ -63,6 +62,24 @@ class Variable:
         if self.name is None:
             return ''
         return self.name
+
+    def __eq__(self, other):
+        return sorted(self.components) == sorted(other.components)
+
+    def write_name(self):
+        self.name = ""
+        self.components.sort()
+        freq = {}
+        for e in self.components:
+            if freq.get(e) is None:
+                freq[e] = 1
+            else:
+                freq[e] += 1
+        for e in freq:
+            if freq[e] == 1:
+                self.name += e
+            else:
+                self.name += f'{e}^{freq[e]}'
 
     def _parse_variable(self, name: str):
         if name is not None:
@@ -89,10 +106,13 @@ class Variable:
                             power = None
                         curr_var = name[i]
 
+    def mul(self, other):
+        self.components.extend(other.components)
+        self.write_name()
+
 
 class Expression:
     def __init__(self, exp: str):
-        """Elements in the expression are space separated."""
         self._parse_expression(exp)
 
     def _parse_expression(self, exp: str):
@@ -117,10 +137,11 @@ class Expression:
                         self.elements.append(Element(exp[begin:i]))
                     begin = i
 
+    def simplify(self):
+        pass
 
-# ex = Expression('-2 + 10a^2 * 6a + 2 / 9')
-# print(ex.elements)
-# for e in ex.elements:
-#     print(f'{e} -> {type(e)}')
-first = Element('ab^2')
-print(first.variable.components)
+
+first = Variable('ab^2')
+second = Variable('a')
+first.mul(second)
+print(first)
