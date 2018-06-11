@@ -126,18 +126,36 @@ class Variable:
 
 class Expression:
     def __init__(self, exp: str):
+        self.given_exp = exp
+        self.elements = []
         self._parse_expression(exp)
 
-    def _parse_expression(self, exp: str):
-        self.elements = []
+    def __repr__(self):
+        out = ''
+        for i in range(len(self.elements)):
+            if i == 0:
+                out += f'{self.elements[i]}'
+            elif isinstance(self.elements[i], str):
+                out += f' {self.elements[i]}'
+            else:
+                if isinstance(self.elements[i - 1], str):
+                    out += f' {self.elements[i]}'
+                else:
+                    e = f'{self.elements[i]}'
+                    if e[0] == '-':
+                        out += f' + {e[1:]}'
+                    else:
+                        out += f' - {e}'
+        return out
 
+    def _parse_expression(self, exp: str):
         exp = ''.join(exp.split())  # remove spaces from exp
         exp += '-1'  # not part of the expression, just so the loop can execute twice more
         begin = 0
         for i in range(1, len(exp)):
 
             if exp[begin] == '*' or exp[begin] == '/':
-                self.elements.append(symbols.get(exp[begin]))
+                self.elements.append(exp[begin])
                 begin = i
             else:
                 if exp[i] in symbols:
@@ -151,9 +169,36 @@ class Expression:
                     begin = i
 
     def simplify(self):
-        pass
+        i = 0
+        while i < len(self.elements):
+            if isinstance(self.elements[i], str):
+                new_elem = Element.apply_operator(
+                    self.elements[i - 1],
+                    self.elements[i + 1],
+                    self.elements[i]
+                )
+                self.elements.insert(i + 2, new_elem)
+                self.elements = self.elements[:i - 1] + self.elements[i + 2:]
+            else:
+                i += 1
+
+        # By this point, all items in self.elements should be Element objects
+        i = 0
+        while i < len(self.elements):
+            j = i + 1
+            while j < len(self.elements):
+                try:
+                    self.elements[i].add(self.elements[j])
+                    del self.elements[j]
+                except ValueError:
+                    j += 1
+            i += 1
 
 
+"""
 a = Element('4a^2')
 b = Element('2aa')
-print(Element.apply_operator(a, b, '/'))
+print(Element.apply_operator(a, b, '/'))"""
+ex = Expression('4a + 10b - a')
+ex.simplify()
+print(ex)
