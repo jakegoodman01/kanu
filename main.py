@@ -74,22 +74,29 @@ class Variable:
         return self.name
 
     def __eq__(self, other):
-        return sorted(self.components) == sorted(other.components)
+        if self.components is None and other.components is None:
+            return True
+
+        try:
+            return sorted(self.components) == sorted(other.components)
+        except TypeError:
+            return False
 
     def write_name(self):
-        self.name = ""
-        self.components.sort()
-        freq = {}
-        for e in self.components:
-            if freq.get(e) is None:
-                freq[e] = 1
-            else:
-                freq[e] += 1
-        for e in freq:
-            if freq[e] == 1:
-                self.name += e
-            else:
-                self.name += f'{e}^{freq[e]}'
+        if self.components is not None:
+            self.name = ""
+            self.components.sort()
+            freq = {}
+            for e in self.components:
+                if freq.get(e) is None:
+                    freq[e] = 1
+                else:
+                    freq[e] += 1
+            for e in freq:
+                if freq[e] == 1:
+                    self.name += e
+                else:
+                    self.name += f'{e}^{freq[e]}'
 
     def _parse_variable(self, name: str):
         if name is not None:
@@ -143,9 +150,9 @@ class Expression:
                 else:
                     e = f'{self.elements[i]}'
                     if e[0] == '-':
-                        out += f' + {e[1:]}'
+                        out += f' - {e[1:]}'
                     else:
-                        out += f' - {e}'
+                        out += f' + {e}'
         return out
 
     def _parse_expression(self, exp: str):
@@ -172,13 +179,23 @@ class Expression:
         i = 0
         while i < len(self.elements):
             if isinstance(self.elements[i], str):
-                new_elem = Element.apply_operator(
-                    self.elements[i - 1],
-                    self.elements[i + 1],
-                    self.elements[i]
-                )
-                self.elements.insert(i + 2, new_elem)
-                self.elements = self.elements[:i - 1] + self.elements[i + 2:]
+                try:
+                    new_elem = Element.apply_operator(
+                        self.elements[i - 1],
+                        self.elements[i + 1],
+                        self.elements[i]
+                    )
+                    self.elements.insert(i + 2, new_elem)
+                    self.elements = self.elements[:i - 1] + self.elements[i + 2:]
+
+                except ValueError:
+                    if self.elements[i] == '+':
+                        del self.elements[i]
+                    elif self.elements[i] == '-':
+                        if self.elements[i + 1].coefficient < 0:
+                            self.elements[i + 1].coefficient *= -1
+                        del self.elements[i]
+
             else:
                 i += 1
 
@@ -199,6 +216,6 @@ class Expression:
 a = Element('4a^2')
 b = Element('2aa')
 print(Element.apply_operator(a, b, '/'))"""
-ex = Expression('4a + 10b - a')
+ex = Expression('4a * +2a +4')
 ex.simplify()
 print(ex)
