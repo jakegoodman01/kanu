@@ -6,7 +6,7 @@ symbols = {'+': operator.add, '-': operator.sub, '*': operator.mul, '/': operato
 class Element:
     def __init__(self, value: str):
         elem = Element.separate_coefficient(value)
-        self.coefficient = int(elem[0])
+        self.coefficient = float(elem[0])
         self.variable = Variable(elem[1])
 
     def __repr__(self):
@@ -16,6 +16,8 @@ class Element:
             return f'0'
         if self.coefficient == 1:
             return f'{self.variable}'
+        if self.coefficient % 1 == 0.0:
+            return f'{int(self.coefficient)}{self.variable}'
         return f'{self.coefficient}{self.variable}'
 
     @classmethod
@@ -30,8 +32,15 @@ class Element:
             else:
                 raise ValueError('Cannot add or subtract elements of different terms')
         else:
-            # TODO: Implement applying * and / operators onto Elements
-            pass
+            var = Variable(a.variable.name)
+
+            if op == '*':
+                var.mul(b.variable)
+            else:
+                var.div(b.variable)
+
+            coefficient = symbols.get(op)(a.coefficient, b.coefficient)
+            return Element(f'{coefficient}{var.name}')
 
     @classmethod
     def separate_coefficient(cls, e) -> tuple:
@@ -54,9 +63,10 @@ class Element:
 
 class Variable:
     def __init__(self, name: str):
-        self.name = name
+        self.name = ""
         self.components = None
         self._parse_variable(name)
+        self.write_name()
 
     def __repr__(self):
         if self.name is None:
@@ -110,6 +120,9 @@ class Variable:
         self.components.extend(other.components)
         self.write_name()
 
+    def div(self, other):
+        pass
+
 
 class Expression:
     def __init__(self, exp: str):
@@ -141,7 +154,6 @@ class Expression:
         pass
 
 
-first = Variable('ab^2')
-second = Variable('a')
-first.mul(second)
-print(first)
+a = Element('4a^2')
+b = Element('2aa')
+print(Element.apply_operator(a, b, '/'))
