@@ -50,8 +50,11 @@ class Element:
             if e[i].isalpha():
                 if i == 0:
                     return '1', e
-                if i == 1 and not e[0].isdigit():
-                    return f'{e[0]}1', e[i:]
+                elif not e[0].isdigit():
+                    if i == 1:
+                        return f'{e[:1]}1', e[1:]
+                    elif i == 2:
+                        return f'{e[:2]}', e[2:]
                 return e[:i], e[i:]
         # If the for loop completes, there was no variable in e
         return e, None
@@ -98,8 +101,15 @@ class Variable:
             power = 1
             for i in range(1, len(name)):
                 if check_exponent:
-                    power = int(name[i])
-                    check_exponent = False
+                    if name[i] == '-':
+                        pass
+                    elif name[i - 1] == '-':
+                        power = int(name[i - 1:i + 1])
+                        check_exponent = False
+                    else:
+                        power = int(name[i])
+                        check_exponent = False
+
                 elif name[i] == '^':
                     check_exponent = True
                 else:
@@ -120,7 +130,12 @@ class Variable:
         self.write_name()
 
     def div(self, other):
-        pass
+        for e in other.components:
+            if self.components.get(e) is None:
+                self.components[e] = other.components[e] * -1
+            else:
+                self.components[e] -= other.components[e]
+        self.write_name()
 
 
 class Expression:
@@ -157,9 +172,9 @@ class Expression:
                 self.elements.append(exp[begin])
                 begin = i
             else:
-                if exp[i] in symbols:
+                if exp[i] in symbols and exp[i - 1] != '^':
                     if i - begin == 1:
-                        if exp[begin].isdigit():
+                        if exp[begin].isdigit() or exp[begin].isalpha():
                             self.elements.append(Element(exp[begin]))
                         else:
                             self.elements.append(exp[begin])
