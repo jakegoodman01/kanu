@@ -14,7 +14,9 @@ class Element:
             return f'{self.coefficient}'
         if self.coefficient == 0:
             return f'0'
-        if self.coefficient == 1:
+        if self.coefficient == 1.0:
+            if self.variable.components == {}:
+                return '1'
             return f'{self.variable}'
         if self.coefficient % 1 == 0.0:
             return f'{int(self.coefficient)}{self.variable}'
@@ -64,7 +66,7 @@ class Element:
 class Variable:
     def __init__(self, name: str):
         self.name = ""
-        self.components = None
+        self.components = {}
         self._parse_variable(name)
         self.write_name()
 
@@ -74,57 +76,47 @@ class Variable:
         return self.name
 
     def __eq__(self, other):
-        if self.components is None and other.components is None:
-            return True
-
-        try:
-            return sorted(self.components) == sorted(other.components)
-        except TypeError:
-            return False
+        return self.components == other.components
 
     def write_name(self):
-        if self.components is not None:
-            self.name = ""
-            self.components.sort()
-            freq = {}
-            for e in self.components:
-                if freq.get(e) is None:
-                    freq[e] = 1
+        if self.components != {}:
+            self.name = ''
+            keys = sorted(list(self.components.keys()))
+            for key in keys:
+                if self.components[key] == 0:
+                    pass
+                elif self.components[key] == 1:
+                    self.name += f'{key}'
                 else:
-                    freq[e] += 1
-            for e in freq:
-                if freq[e] == 1:
-                    self.name += e
-                else:
-                    self.name += f'{e}^{freq[e]}'
+                    self.name += f'{key}^{self.components[key]}'
 
     def _parse_variable(self, name: str):
         if name is not None:
             name += 'z'  # not part of the variable name, just so the loop can execute once more
-            self.components = []  # Contains the number of variables in the name. For example: a^2b -> [a, a, b]
             curr_var = name[0]
             check_exponent = False
-            power = None
-            if len(name) == 1:
-                self.components.append(curr_var)
-            else:
-                for i in range(1, len(name)):
-                    if check_exponent:
-                        power = int(name[i])
-                        check_exponent = False
-                    elif name[i] == '^':
-                        check_exponent = True
+            power = 1
+            for i in range(1, len(name)):
+                if check_exponent:
+                    power = int(name[i])
+                    check_exponent = False
+                elif name[i] == '^':
+                    check_exponent = True
+                else:
+                    #  this code is run when a new letter has been read
+                    if self.components.get(curr_var) is None:
+                        self.components[curr_var] = power
                     else:
-                        #  this code is run when a new letter has been read
-                        if power is None:
-                            self.components.append(curr_var)
-                        else:
-                            self.components.extend([curr_var for j in range(power)])
-                            power = None
-                        curr_var = name[i]
+                        self.components[curr_var] += power
+                    curr_var = name[i]
+                    power = 1
 
     def mul(self, other):
-        self.components.extend(other.components)
+        for e in other.components:
+            if self.components.get(e) is None:
+                self.components[e] = other.components[e]
+            else:
+                self.components[e] += other.components[e]
         self.write_name()
 
     def div(self, other):
@@ -212,10 +204,7 @@ class Expression:
             i += 1
 
 
-"""
-a = Element('4a^2')
-b = Element('2aa')
-print(Element.apply_operator(a, b, '/'))"""
-ex = Expression('4a * +2a +4')
-ex.simplify()
-print(ex)
+while True:
+    ex = Expression(input())
+    ex.simplify()
+    print(ex)
