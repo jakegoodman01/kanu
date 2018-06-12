@@ -167,7 +167,6 @@ class Expression:
         exp += '-1'  # not part of the expression, just so the loop can execute twice more
         begin = 0
         for i in range(1, len(exp)):
-
             if exp[begin] == '*' or exp[begin] == '/':
                 self.elements.append(exp[begin])
                 begin = i
@@ -181,6 +180,9 @@ class Expression:
                     else:
                         self.elements.append(Element(exp[begin:i]))
                     begin = i
+
+    def _remove_parens(self, exp: str):
+        pass
 
     def simplify(self):
         i = 0
