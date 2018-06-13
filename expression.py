@@ -16,7 +16,7 @@ class Element:
             return f'0'
         if self.coefficient == 1.0:
             if self.variable.components == {}:
-                return '1'
+                return f'1'
             return f'{self.variable}'
         if self.coefficient % 1 == 0.0:
             return f'{int(self.coefficient)}{self.variable}'
@@ -83,6 +83,7 @@ class Variable:
 
     def write_name(self):
         if self.components != {}:
+            self._remove_redundant_variables()
             self.name = ''
             keys = sorted(list(self.components.keys()))
             for key in keys:
@@ -120,6 +121,14 @@ class Variable:
                         self.components[curr_var] += power
                     curr_var = name[i]
                     power = 1
+
+    def _remove_redundant_variables(self):
+        keys_to_remove = []
+        for key in self.components:
+            if self.components[key] == 0:
+                keys_to_remove.append(key)
+        for key in keys_to_remove:
+            del self.components[key]
 
     def mul(self, other):
         for e in other.components:
@@ -220,8 +229,9 @@ class Expression:
                     j += 1
             i += 1
 
-
+"""
 while True:
-    ex = Expression(input())
-    ex.simplify()
-    print(ex)
+    el = Element(input())
+    print(el.coefficient)
+    print(el.variable)
+"""
