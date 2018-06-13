@@ -7,20 +7,28 @@ class Element:
     def __init__(self, value: str):
         elem = Element.separate_coefficient(value)
         self.coefficient = float(elem[0])
-        self.variable = Variable(elem[1])
+        if self.coefficient == 0.0:
+            self.variable = None
+        else:
+            self.variable = Variable(elem[1])
 
     def __repr__(self):
-        if self.variable is None:
-            return f'{self.coefficient}'
-        if self.coefficient == 0:
-            return f'0'
+        if self.variable is None or self.coefficient == 0 \
+                or self.coefficient == 0.0 or self.variable.components == {}:
+            try:
+                return f'{int(self.coefficient)}'
+            except ValueError:
+                return f'{self.coefficient}'
         if self.coefficient == 1.0:
-            if self.variable.components == {}:
-                return f'1'
             return f'{self.variable}'
+        if self.coefficient == -1.0:
+            return f'-{self.variable}'
         if self.coefficient % 1 == 0.0:
             return f'{int(self.coefficient)}{self.variable}'
         return f'{self.coefficient}{self.variable}'
+
+    def __eq__(self, other):
+        return self.coefficient == other.coefficient and self.variable == other.variable
 
     @classmethod
     def apply_operator(cls, a, b, op: str):
@@ -34,7 +42,10 @@ class Element:
             else:
                 raise ValueError('Cannot add or subtract elements of different terms')
         else:
-            var = Variable(a.variable.name)
+            try:
+                var = Variable(a.variable.name)
+            except AttributeError:
+                return Element('0')
 
             if op == '*':
                 var.mul(b.variable)
@@ -50,11 +61,8 @@ class Element:
             if e[i].isalpha():
                 if i == 0:
                     return '1', e
-                elif not e[0].isdigit():
-                    if i == 1:
-                        return f'{e[:1]}1', e[1:]
-                    elif i == 2:
-                        return f'{e[:2]}', e[2:]
+                elif i == 1 and not e[0].isdigit():
+                    return f'{e[:1]}1', e[1:]
                 return e[:i], e[i:]
         # If the for loop completes, there was no variable in e
         return e, None
@@ -68,7 +76,7 @@ class Element:
 
 class Variable:
     def __init__(self, name: str):
-        self.name = ""
+        self.name = None
         self.components = {}
         self._parse_variable(name)
         self.write_name()
