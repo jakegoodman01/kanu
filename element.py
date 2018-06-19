@@ -42,6 +42,10 @@ class Element:
     def separate_coefficient(cls, e: str) -> tuple:
         if e[0] == '+':
             e = e[1:]
+
+        if '^' in e and e[:e.index('^')].isdigit():
+            return '1', e
+
         for i in range(len(e)):
             if e[i].isalpha():
                 if i == 0:
@@ -80,10 +84,10 @@ class Variable:
             self.name = ''
             keys = sorted(list(self.components.keys()))
             for key in keys:
-                if self.components[key] == Element('0'):
-                    pass
-                elif self.components[key] == Element('1'):
+                if self.components[key] == Element('1'):
                     self.name += f'{key}'
+                elif not repr(self.components[key]).isdigit() and len(repr(self.components[key])) > 1:
+                    self.name += f'{key}^({self.components[key]})'
                 else:
                     self.name += f'{key}^{self.components[key]}'
 
@@ -108,16 +112,13 @@ class Variable:
                             if name[j].isalpha():
                                 end = j
                                 break
-                            elif j == len(name) - 1:
-                                end = j + 1
-                                break
-
-                        if end == i + 1:
-                            power = Element(name[i:end + 1])
+                        if name[i] == '-' and end == i + 1:
+                            power = Element(name[i: end + 1])
+                            i = end
                         else:
                             power = Element(name[i:end])
+                            i = end - 1
                         check_exponent = False
-                        i = end
                 elif name[i] == '^':
                     check_exponent = True
                 else:
@@ -131,7 +132,18 @@ class Variable:
                 i += 1
 
     def _remove_redundant_variables(self):
+        """Removes all keys with value of zero because it equals one, and that is redundant
+        """
+        keys_to_remove = []
         for c in self.components:
             if self.components[c] == Element('0'):
-                del self.components[c]
+                keys_to_remove.append(c)
+        for k in keys_to_remove:
+            del self.components[k]
 
+
+if __name__ == '__main__':
+    v = Variable('ab^(3a^(4a^e)c)')
+    print(v)
+    print(v.components)
+    print(v.components['b'].variable.components)
