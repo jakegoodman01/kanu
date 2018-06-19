@@ -20,7 +20,10 @@ class Element:
     def __init__(self, rep: str):
         elem = Element.separate_coefficient(rep)
         self.coefficient = float(elem[0])
-        self.variable = Variable(elem[1])
+        if self.coefficient != 0.0:
+            self.variable = Variable(elem[1])
+        else:
+            self.variable = Variable(None)
 
     def __repr__(self):
         if self.variable is None:
@@ -56,11 +59,31 @@ class Element:
         # If the for loop completes, there was no variable in e
         return e, None
 
-    def add(self, elem):
-        if self.variable == elem.variable:
-            self.coefficient += elem.coefficient
+    @classmethod
+    def add(cls, e1, e2):
+        if e1.variable == e2.variable:
+            return Element(f'{e1.coefficient + e2.coefficient}{e1.variable}')
         else:
             raise ValueError('Cannot add or subtract elements of different terms')
+
+    @classmethod
+    def sub(cls, e1, e2):
+        if e1.variable == e2.variable:
+            return Element(f'{e1.coefficient - e2.coefficient}{e1.variable}')
+        else:
+            raise ValueError('Cannot add or subtract elements of different terms')
+
+    @classmethod
+    def mul(cls, e1, e2):
+        coefficient = e1.coefficient * e2.coefficient
+        var = Variable.mul(e1.variable, e2.variable)
+        return Element(f'{coefficient}{var}')
+
+    @classmethod
+    def div(cls, e1, e2):
+        coefficient = e1.coefficient / e2.coefficient
+        var = Variable.div(e1.variable, e2.variable)
+        return Element(f'{coefficient}{var}')
 
 
 class Variable:
@@ -77,6 +100,26 @@ class Variable:
 
     def __eq__(self, other):
         return self.components == other.components
+
+    @classmethod
+    def mul(cls, v1, v2):
+        for e in v2.components:
+            if v1.components.get(e) is None:
+                v1.components[e] = v2.components[e]
+            else:
+                v1.components[e] += v2.components[e]
+        v1.write_name()
+        return v1
+
+    @classmethod
+    def div(cls, v1, v2):
+        for e in v2.components:
+            if v1.components.get(e) is None:
+                v1.components[e] = v2.components[e] * -1
+            else:
+                v1.components[e] -= v2.components[e]
+        v1.write_name()
+        return v1
 
     def write_name(self):
         self._remove_redundant_variables()
@@ -143,7 +186,4 @@ class Variable:
 
 
 if __name__ == '__main__':
-    v = Variable('ab^(3a^(4a^e)c)')
-    print(v)
-    print(v.components)
-    print(v.components['b'].variable.components)
+    pass
