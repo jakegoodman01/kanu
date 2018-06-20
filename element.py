@@ -89,7 +89,7 @@ class Element:
 class Variable:
     def __init__(self, rep: str):
         self.name = ""
-        self.components = {} # dictionary, mapping a letter variable to it's frequency, represented as an Element
+        self.components = {}  # dictionary, mapping a letter variable to it's frequency, represented as an Element
         self._parse_variable(rep)
         self.write_name()
 
@@ -149,15 +149,16 @@ class Variable:
                         i += right_paren
                         check_exponent = False
                     else:
-                        # end is the index of the first letter character after name[i]
+                        # end is the index of the first letter character after name[i], that is not an exponent
                         end = None
                         for j in range(i + 1, len(name)):
-                            if name[j].isalpha():
+                            if name[j].isalpha() and name[j - 1] != '^':
                                 end = j
                                 break
-                        if name[i] == '-' and end == i + 1:
-                            power = Element(name[i: end + 1])
-                            i = end
+
+                        if end == i + 1 and name[i] == '-':
+                            power = Element(name[i:end + 1])
+                            i += 1
                         else:
                             power = Element(name[i:end])
                             i = end - 1
