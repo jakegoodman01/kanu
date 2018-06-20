@@ -107,7 +107,7 @@ class Variable:
             if v1.components.get(e) is None:
                 v1.components[e] = v2.components[e]
             else:
-                v1.components[e] += v2.components[e]
+                v1.components[e] = Element.add(v1.components[e], v2.components[e])
         v1.write_name()
         return v1
 
@@ -117,7 +117,7 @@ class Variable:
             if v1.components.get(e) is None:
                 v1.components[e] = v2.components[e] * -1
             else:
-                v1.components[e] -= v2.components[e]
+                v1.components[e] = Element.sub(v1.components[e], v2.components[e])
         v1.write_name()
         return v1
 
