@@ -46,7 +46,10 @@ class Element:
         if e[0] == '+':
             e = e[1:]
 
-        if '^' in e and e[:e.index('^')].isdigit():
+        if '^' in e and (e[:e.index('^')].isdigit() or e[1:e.index('^')].isdigit() and e[0] == '-'):
+            """ This check is for when e represents a real number raised to a power, not a variable.
+                i.e. -2^4
+            """
             return '1', e
 
         for i in range(len(e)):
@@ -88,13 +91,13 @@ class Element:
 
 class Variable:
     def __init__(self, rep: str):
-        self.name = ""
+        self.name = ''
         self.components = {}  # dictionary, mapping a letter variable to it's frequency, represented as an Element
         self._parse_variable(rep)
         self.write_name()
 
     def __repr__(self):
-        if self.name == "":
+        if self.name == '':
             return ''
         return self.name
 
@@ -115,7 +118,7 @@ class Variable:
     def div(cls, v1, v2):
         for e in v2.components:
             if v1.components.get(e) is None:
-                v1.components[e] = v2.components[e] * -1
+                v1.components[e] = Element.mul(v2.components[e], Element('-1'))
             else:
                 v1.components[e] = Element.sub(v1.components[e], v2.components[e])
         v1.write_name()

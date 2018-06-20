@@ -1,5 +1,5 @@
 import unittest
-from element import *
+from expression import *
 
 
 class ModuleTests(unittest.TestCase):
@@ -23,15 +23,21 @@ class ElementTests(unittest.TestCase):
         self.assertEqual(Element.separate_coefficient('4^2'), ('1', '4^2'))
         self.assertEqual(Element.separate_coefficient('4^a'), ('1', '4^a'))
         self.assertEqual(Element.separate_coefficient('1000a^4'), ('1000', 'a^4'))
+        self.assertEqual(Element.separate_coefficient('-1^a^2'), ('1', '-1^a^2'))
+
+    def test_eq(self):
+        self.assertEqual(Element('a^2b') == Element('ba^2'), True)
+        self.assertEqual(Element('a^0') == Element('1'), True)
+        self.assertEqual(Element('a^2b') == Element('ab^2'), False)
 
     def test_repr(self):
         e1 = Element('+123')
         e2 = Element('0ab^4')
-        e3 = Element('a^0')
+        e3 = Element('-a^0')
 
         self.assertEqual(repr(e1), '123')
         self.assertEqual(repr(e2), '0')
-        self.assertEqual(repr(e3), '1')
+        self.assertEqual(repr(e3), '-1')
 
 
 class VariableTests(unittest.TestCase):
@@ -62,6 +68,19 @@ class VariableTests(unittest.TestCase):
         self.assertEqual(repr(v3), 'ab^(9^4)')
         self.assertEqual(repr(v4), 'a^(a^(b^(3^(4^v))))')
         self.assertEqual(repr(v5), '')
+
+
+class ExpressionTests(unittest.TestCase):
+    def test_operator_list(self):
+        o1 = OperatorList('+', Element('1'), Element('5a'), Element('6a'))
+        o2 = OperatorList('-', Element('10'), Element('a^2'), Element('8'), Element('7a^2'))
+        o3 = OperatorList('*', Element('4'), Element('4'), Element('ab'))
+        o4 = OperatorList('/', Element('10a'), Element('b'), Element('2a'))
+
+        self.assertEqual(o1.members, [Element('1'), Element('11a')])
+        self.assertEqual(o2.members, [Element('2'), Element('-6a^2')])
+        self.assertEqual(o3.members, [Element('16ab')])
+        self.assertEqual(o4.members, [Element('5b^-1')])
 
 
 if __name__ == '__main__':
