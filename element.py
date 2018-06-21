@@ -88,6 +88,15 @@ class Element:
         var = Variable.div(e1.variable, e2.variable)
         return Element(f'{coefficient}{var}')
 
+    @classmethod
+    def pow(cls, e1, e2):
+        if not repr(e2).isdigit():
+            return Element(f'{e1}^({e2})')
+        elem = Element('1')
+        for i in range(int(repr(e2)) ):
+            elem = Element.mul(elem, e1)
+        return elem
+
 
 class Variable:
     def __init__(self, rep: str):
@@ -126,8 +135,8 @@ class Variable:
 
     def write_name(self):
         self._remove_redundant_variables()
+        self.name = ''
         if self.components != {}:
-            self.name = ''
             keys = sorted(list(self.components.keys()))
             for key in keys:
                 if self.components[key] == Element('1'):
@@ -136,7 +145,7 @@ class Variable:
                     self.name += f'{key}^({self.components[key]})'
                 else:
                     self.name += f'{key}^{self.components[key]}'
-
+        
     def _parse_variable(self, name: str):
         if name is not None:
             name += 'z'  # not part of the variable name, just so the loop can execute once more
@@ -179,14 +188,21 @@ class Variable:
                 i += 1
 
     def _remove_redundant_variables(self):
-        """Removes all keys with value of zero because it equals one, and that is redundant
+        """ Removes all keys with value of zero because it equals one, and that is redundant.
+            Also calculates exponents of two integers.
         """
         keys_to_remove = []
+        keys_to_add = []
         for c in self.components:
             if self.components[c] == Element('0'):
                 keys_to_remove.append(c)
+            if repr(self.components[c]).isdigit() and c.isdigit():
+                keys_to_remove.append(c)
+                keys_to_add.append(repr(Element.pow(Element(c), self.components[c])))
         for k in keys_to_remove:
             del self.components[k]
+        for k in keys_to_add:
+            self.components[k] = Element('1')
 
 
 if __name__ == '__main__':
