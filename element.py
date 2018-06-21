@@ -16,12 +16,24 @@ def get_matching_paren(exp: str) -> int:
     return i - 1
 
 
+class NotValidVariable(Exception):
+    """ This exception is raised when the variable of an expression is a valid number, and the coefficient is 1.
+        For example, Element e has coefficient of 1, and variable of 27. They should be flipped because 27 is a valid
+        number."""
+    def __init__(self, coefficient: float):
+        self.coefficient = coefficient
+
+
 class Element:
     def __init__(self, rep: str):
         elem = Element.separate_coefficient(rep)
         self.coefficient = float(elem[0])
         if self.coefficient != 0.0:
-            self.variable = Variable(elem[1])
+            try:
+                self.variable = Variable(elem[1])
+            except NotValidVariable as nvv:
+                self.coefficient = nvv.coefficient
+                self.variable = Variable(None)
         else:
             self.variable = Variable(None)
 
@@ -145,7 +157,10 @@ class Variable:
                     self.name += f'{key}^({self.components[key]})'
                 else:
                     self.name += f'{key}^{self.components[key]}'
-        
+        if len(self.components) == 1 and list(self.components.keys())[0].isdigit():
+            raise NotValidVariable(float(list(self.components.keys())[0]))
+
+
     def _parse_variable(self, name: str):
         if name is not None:
             name += 'z'  # not part of the variable name, just so the loop can execute once more
@@ -206,4 +221,6 @@ class Variable:
 
 
 if __name__ == '__main__':
-    pass
+    e = Element('13')
+    print(e.coefficient)
+    print(e.variable)
