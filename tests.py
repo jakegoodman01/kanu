@@ -59,28 +59,41 @@ class VariableTests(unittest.TestCase):
     def test_repr(self):
         v1 = Variable('a')
         v2 = Variable('a^2')
-        v3 = Variable('ab^9^4')
+        v3 = Variable('ab^9^2')
         v4 = Variable('a^a^b^3^4^v')
         v5 = Variable('b^0')
 
         self.assertEqual(repr(v1), 'a')
         self.assertEqual(repr(v2), 'a^2')
-        self.assertEqual(repr(v3), 'ab^(9^4)')
+        self.assertEqual(repr(v3), 'ab^81')
         self.assertEqual(repr(v4), 'a^(a^(b^(3^(4^v))))')
         self.assertEqual(repr(v5), '')
 
 
 class ExpressionTests(unittest.TestCase):
     def test_operator_list(self):
-        o1 = OperatorList('+', Element('1'), Element('5a'), Element('6a'))
-        o2 = OperatorList('-', Element('10'), Element('a^2'), Element('8'), Element('7a^2'))
-        o3 = OperatorList('*', Element('4'), Element('4'), Element('ab'))
-        o4 = OperatorList('/', Element('10a'), Element('b'), Element('2a'))
+        o1 = OperatorList(Element('1'), Element('5a'), Element('6a'), operation='+')
+        o2 = OperatorList(Element('10'), Element('a^2'), Element('8'), Element('7a^2'), operation='-')
+        o3 = OperatorList(Element('4'), Element('4'), Element('ab'), operation='*')
+        o4 = OperatorList(Element('10a'), Element('b'), Element('2a'), operation='/')
 
         self.assertEqual(o1.members, [Element('1'), Element('11a')])
         self.assertEqual(o2.members, [Element('2'), Element('-6a^2')])
         self.assertEqual(o3.members, [Element('16ab')])
         self.assertEqual(o4.members, [Element('5b^-1')])
+
+    def test_format_parens(self):
+        self.assertEqual(format_parens('3(a + b)'), '3*(a + b)')
+        self.assertEqual(format_parens('a^2(bc)(4 + a)'), 'a^2*(bc)*(4 + a)')
+
+    def test_parse_expression(self):
+        self.assertEqual(parse_expression(' 3   *(1  + b)'), ['3', '*', '(', '1', '+', 'b', ')'])
+        self.assertEqual(parse_expression('123 + 4 5 * a / b'), ['123', '+', '45', '*', 'a', '/', 'b'])
+
+    def test_to_rpn(self):
+        self.assertEqual(to_rpn(['(', '12', '-', 'a', ')', '/', '3']), ['12', 'a', '-', '3', '/'])
+        self.assertEqual(to_rpn(['5', '+', '2', '^', '3']), ['5', '2', '3', '^', '+'])
+
 
 
 if __name__ == '__main__':

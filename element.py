@@ -157,9 +157,10 @@ class Variable:
                     self.name += f'{key}^({self.components[key]})'
                 else:
                     self.name += f'{key}^{self.components[key]}'
-        if len(self.components) == 1 and list(self.components.keys())[0].isdigit():
-            raise NotValidVariable(float(list(self.components.keys())[0]))
 
+            first_key = list(self.components.keys())[0]
+            if len(self.components) == 1 and first_key.isdigit() and self.components[first_key] == Element('1'):
+                raise NotValidVariable(float(list(self.components.keys())[0]))
 
     def _parse_variable(self, name: str):
         if name is not None:
