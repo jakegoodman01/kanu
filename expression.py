@@ -1,6 +1,7 @@
 from element import *
 
 operations = {'+': Element.add, '-': Element.sub, '*': Element.mul, '/': Element.div}
+operator_precedence = {'+': 2, '-': 2, '*': 3, '/': 3, '^': 4}
 
 
 class OperatorList:
@@ -52,37 +53,68 @@ class OperatorList:
                 i += 1
 
 
-class ExpressionParser:
-    def __init__(self, exp: str):
-        self.exp = ExpressionParser._format_parens(exp)
-        self.elements = ExpressionParser._parse_expression(self.exp)
-
-    @classmethod
-    def _format_parens(cls, exp: str) -> str:
-        exp_list = list(exp)
-        i = 0
-        while i < len(exp_list):
-            if exp_list[i] == '(':
-                exp_list.insert(i, '*')
-                i += 1
+def format_parens(exp: str) -> str:
+    exp_list = list(exp)
+    i = 0
+    while i < len(exp_list):
+        if i > 0 and exp_list[i] == '(' and (exp_list[i - 1].isdigit() or exp_list[i - 1] == ')'):
+            exp_list.insert(i, '*')
             i += 1
-        return ''.join(exp_list)
+        i += 1
+    return ''.join(exp_list)
 
-    @classmethod
-    def _parse_expression(cls, exp: str) -> OperatorList:
-        exp = ''.join(exp.split())  # remove spaces from exp
-        for i in range(len(exp)):
-            if exp[i] in ('+', '-', '*', '/', '^'):
-                return OperatorList(
-                    OperatorList(ExpressionParser._parse_expression(exp[:i])),
-                    OperatorList(ExpressionParser._parse_expression(exp[i + 1:])),
-                    operation=exp[i]
-                )
 
-        # there are no operators once program flow reaches this point
-        return Element(exp)
+def parse_expression(exp: str) -> list:
+    # the '-' character is not part of the expression, it's function is so that the while loop executes once more
+    exp = ''.join(exp.split()) + '-'
+    elements = []
+    i = 0
+    begin = -1
+    while i < len(exp):
+        if exp[i].isdigit():
+            if begin == -1:
+                begin = i
+        elif begin == -1:
+            elements.append(exp[i])
+        else:
+            elements.append(exp[begin:i])
+            elements.append(exp[i])
+            begin = -1
+        i += 1
+    return elements[:-1]
+
+
+def to_rpn(elements: list) -> list:
+    """Conversion to reverse polish notation, implementing the Shunting-yard algorithm"""
+    i = 0
+    output_queue = []
+    op_stack = []
+    while i < len(elements):
+        token = elements[i]
+        if token.isdigit() or token.isalpha():
+            output_queue.append(token)
+        elif token in ('+', '-', '*', '/', '^'):
+            while len(op_stack) > 0 and \
+                    op_stack[-1] != '(' \
+                    and operator_precedence[op_stack[-1]] >= operator_precedence[token]:
+                output_queue.append(op_stack.pop())
+            op_stack.append(token)
+        elif token == '(':
+            op_stack.append(token)
+        elif token == ')':
+            while op_stack[-1] != '(':
+                output_queue.append(op_stack.pop())
+            op_stack.pop()
+        i += 1
+
+    while len(op_stack) > 0:
+        output_queue.append(op_stack.pop())
+    return output_queue
 
 
 if __name__ == '__main__':
-    ex = ExpressionParser('a + 2 * b + 1')
-    print(ex.elements)
+    ex = 'a + 2 * (b + 12)'
+    ex = format_parens(ex)
+    ex = parse_expression(ex)
+    ex = to_rpn(ex)
+    print(ex)
