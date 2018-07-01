@@ -78,7 +78,7 @@ class ExpressionTests(unittest.TestCase):
         o4 = OperatorList(Element('10a'), Element('b'), Element('2a'), operation='/')
 
         self.assertEqual(o1.members, [Element('1'), Element('11a')])
-        self.assertEqual(o2.members, [Element('2'), Element('-6a^2')])
+        self.assertEqual(o2.members, [Element('2'), Element('-8a^2')])
         self.assertEqual(o3.members, [Element('16ab')])
         self.assertEqual(o4.members, [Element('5b^-1')])
 
@@ -89,11 +89,16 @@ class ExpressionTests(unittest.TestCase):
     def test_parse_expression(self):
         self.assertEqual(parse_expression(' 3   *(1  + b)'), ['3', '*', '(', '1', '+', 'b', ')'])
         self.assertEqual(parse_expression('123 + 4 5 * a / b'), ['123', '+', '45', '*', 'a', '/', 'b'])
+        self.assertEqual(parse_expression('-12a+-1'), ['-12a', '+', '-1'])
 
     def test_to_rpn(self):
-        self.assertEqual(to_rpn(['(', '12', '-', 'a', ')', '/', '3']), ['12', 'a', '-', '3', '/'])
-        self.assertEqual(to_rpn(['5', '+', '2', '^', '3']), ['5', '2', '3', '^', '+'])
+        self.assertEqual(to_rpn(['(', '12', '-', 'a', ')', '/', '3']), [Element('12'), Element('a'), '-',
+                                                                        Element('3'), '/'])
+        self.assertEqual(to_rpn(['5', '+', '2', '^', '3']), [Element('5'), Element('2'), Element('3'), '^', '+'])
 
+    def test_all_together_now(self):
+        self.assertEqual(all_together_now("a - b * (2 + 1)"), OperatorList(Element('a'), Element('-3b'), operation='+'))
+        self.assertEqual(all_together_now('ab * b^(3 - 1)'), OperatorList(Element('ab^3')))
 
 
 if __name__ == '__main__':

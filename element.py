@@ -105,7 +105,7 @@ class Element:
         if not repr(e2).isdigit():
             return Element(f'{e1}^({e2})')
         elem = Element('1')
-        for i in range(int(repr(e2)) ):
+        for i in range(int(repr(e2))):
             elem = Element.mul(elem, e1)
         return elem
 
