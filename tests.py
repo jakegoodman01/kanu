@@ -89,7 +89,7 @@ class ExpressionTests(unittest.TestCase):
     def test_parse_expression(self):
         self.assertEqual(parse_expression(' 3   *(1  + b)'), ['3', '*', '(', '1', '+', 'b', ')'])
         self.assertEqual(parse_expression('123 + 4 5 * a / b'), ['123', '+', '45', '*', 'a', '/', 'b'])
-        self.assertEqual(parse_expression('-12a+-1'), ['-12a', '+', '-1'])
+        self.assertEqual(parse_expression('-12a+-1'), ['-12', '*', 'a', '+', '-1'])
 
     def test_to_rpn(self):
         self.assertEqual(to_rpn(['(', '12', '-', 'a', ')', '/', '3']), [Element('12'), Element('a'), '-',
