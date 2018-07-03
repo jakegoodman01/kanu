@@ -98,13 +98,15 @@ def parse_expression(exp: str) -> list:
     i = 1
     begin = 0
     while i < len(exp):
-        if exp[i] in operations or exp[i] in ('(', ')'):
+        if exp[i] in operations or exp[i] in ('(', ')') or exp[i].isalpha():
             if exp[i] in ('+', '-') and (exp[i - 1] in operations or exp[i - 1] == '('):
                 # if the above is true, then the sign is a negative sign, rather than a minus sign
                 pass
             else:
                 if begin != i:
                     elements.append(exp[begin:i])
+                if exp[i].isalpha() and (exp[i - 1].isdigit() or exp[i - 1].isalpha()):
+                    elements.append('*')
                 elements.append(exp[i])
                 begin = i + 1
         i += 1
