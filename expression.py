@@ -87,6 +87,11 @@ def format_parens(exp: str) -> str:
                 (exp_list[i - 1].isdigit() or exp_list[i - 1] == ')' or exp_list[i - 1].isalpha()):
             exp_list.insert(i, '*')
             i += 1
+        elif i < len(exp_list) - 1 and exp_list[i] == ')' and \
+                (exp_list[i + 1].isdigit() or exp_list[i + 1].isalpha()):
+            exp_list.insert(i + 1, '*')
+            i += 1
+
         i += 1
     return ''.join(exp_list)
 
