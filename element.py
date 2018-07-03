@@ -91,13 +91,17 @@ class Element:
     @classmethod
     def mul(cls, e1, e2):
         coefficient = e1.coefficient * e2.coefficient
-        var = Variable.mul(e1.variable, e2.variable)
+
+        e1_copy = Element(f'{repr(e1)}')
+        var = Variable.mul(e1_copy.variable, e2.variable)
         return Element(f'{coefficient}{var}')
 
     @classmethod
     def div(cls, e1, e2):
         coefficient = e1.coefficient / e2.coefficient
-        var = Variable.div(e1.variable, e2.variable)
+
+        e1_copy = Element(f'{repr(e1)}')
+        var = Variable.div(e1_copy.variable, e2.variable)
         return Element(f'{coefficient}{var}')
 
     @classmethod
