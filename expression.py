@@ -78,6 +78,22 @@ class OperatorList:
             except ValueError:
                 break
 
+        if self.operation == '*' and len(self.members) == 2:
+            """if the preceding condition is true, this OperatorList must be simplified using the distributive
+                property
+            """
+            new_members = []
+
+            # first and second are OperatorLists and are cast to OperatorLists if they are not already
+            first = self.members[0] if isinstance(self.members[0], OperatorList) else OperatorList(self.members[0])
+            second = self.members[1] if isinstance(self.members[1], OperatorList) else OperatorList(self.members[1])
+
+            for i in first.members:
+                for j in second.members:
+                    new_members.append(Element.mul(i, j))
+            self.members = new_members
+            self.operation = '+'
+
 
 def format_parens(exp: str) -> str:
     exp_list = list(exp)
@@ -100,8 +116,12 @@ def parse_expression(exp: str) -> list:
     # the '-' character is not part of the expression, it's function is so that the while loop executes once more
     exp = ''.join(exp.split()) + '-'
     elements = []
-    i = 1
     begin = 0
+    if exp[0] == '(':
+        elements.append('(')
+        begin += 1
+
+    i = 1
     while i < len(exp):
         if exp[i] in operations or exp[i] in ('(', ')') or exp[i].isalpha():
             if exp[i] in ('+', '-') and (exp[i - 1] in operations or exp[i - 1] == '('):
