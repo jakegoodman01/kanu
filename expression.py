@@ -46,6 +46,20 @@ class OperatorList:
     def __eq__(self, other):
         return self.operation == other.operation and self.members == other.members
 
+    def print(self) -> str:
+        if self.operation == '+':
+            output = [repr(self.members[0])]
+            for i in range(1, len(self.members)):
+                if self.members[i].coefficient < 0:
+                    output.append('-')
+                    output.append(repr(Element.mul(self.members[i], Element('-1'))))
+                else:
+                    output.append('+')
+                    output.append(repr(self.members[i]))
+            return ' '.join(output)
+        else:
+            raise ValueError('Cannot print expression')
+
     def simplify(self):
         i = 0
         while i < len(self.members) - 1:
@@ -93,6 +107,7 @@ class OperatorList:
                     new_members.append(Element.mul(i, j))
             self.members = new_members
             self.operation = '+'
+            self.simplify()
 
 
 def format_parens(exp: str) -> str:
@@ -199,4 +214,4 @@ def all_together_now(expression: str) -> OperatorList:
 
 if __name__ == '__main__':
     while True:
-        print(all_together_now(input()))
+        print(all_together_now(input()).print())
