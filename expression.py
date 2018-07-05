@@ -23,7 +23,7 @@ class OperatorList:
             elif isinstance(e, OperatorList):
                 if operation in ('*', '/'):
                     self.members.append(e)
-                elif not is_first_element and operation in ('+', '-') and e.operation in ('+', '-'):
+                elif not is_first_element and operation in ('+', '-') and e.operation == '-':
                     for i in range(1, len(e.members)):
                         e.members[i] = Element.mul(e.members[i], Element('-1'))
                     self.members.extend(e.members)
@@ -139,7 +139,8 @@ def parse_expression(exp: str) -> list:
     i = 1
     while i < len(exp):
         if exp[i] in operations or exp[i] in ('(', ')') or exp[i].isalpha():
-            if exp[i] in ('+', '-') and (exp[i - 1] in operations or exp[i - 1] == '('):
+            if (exp[i] in ('+', '-') and (exp[i - 1] in operations or exp[i - 1] == '(')) or exp[i].isalpha() \
+                    and exp[i - 1] in operations:
                 # if the above is true, then the sign is a negative sign, rather than a minus sign
                 pass
             else:
@@ -204,14 +205,14 @@ def to_op_list(elements: list) -> OperatorList:
     return OperatorList(*new_elements, operation='+')
 
 
-def all_together_now(expression: str) -> OperatorList:
+def all_together_now(expression: str) -> str:
     """Calls all needed methods to have a readable expression"""
     ex = format_parens(expression)
     ex = parse_expression(ex)
     ex = to_rpn(ex)
-    return to_op_list(ex)
+    return to_op_list(ex).print()
 
 
 if __name__ == '__main__':
     while True:
-        print(all_together_now(input()).print())
+        print(all_together_now(input()))
