@@ -39,6 +39,7 @@ class OperatorList:
             self.operation = operation
 
         self.simplify()
+        self.operation = '+'
 
     def __repr__(self):
         return f'{self.operation}{self.members}'
