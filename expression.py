@@ -205,12 +205,12 @@ def to_op_list(elements: list) -> OperatorList:
     return OperatorList(*new_elements, operation='+')
 
 
-def all_together_now(expression: str) -> str:
+def all_together_now(expression: str) -> OperatorList:
     """Calls all needed methods to have a readable expression"""
     ex = format_parens(expression)
     ex = parse_expression(ex)
     ex = to_rpn(ex)
-    return to_op_list(ex).print()
+    return to_op_list(ex)
 
 
 if __name__ == '__main__':
