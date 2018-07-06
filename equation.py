@@ -8,7 +8,7 @@ def find_variables(exp: OperatorList) -> set:
     return variables
 
 
-def solve(equation: str) -> str:
+def solve_single_linear_equation(equation: str) -> str:
     equal_sign = equation.index('=')
     ls = all_together_now(equation[:equal_sign])
     rs = all_together_now(equation[equal_sign + 1:])
@@ -22,12 +22,32 @@ def solve(equation: str) -> str:
         return 'There are no variables to solve for!'
 
     # Here, it is confirmed that there is only one variable in the equation
+    # The variable is isolated on the left side:
 
-    """return f'ls = {ls}\nrs = {rs}\n\n' \
-           f'ls variables: {find_variables(ls)}\n' \
-           f'rs variables: {find_variables(rs)}\n\n'"""
-    return ''
+    while len(find_variables(rs)) > 0:
+        for element in rs.members:
+            if element.variable.components != {}:
+                # subtracting the element with a variable from both sides
+                rs = OperatorList(*rs.members, Element.mul(element, Element('-1')))
+                ls = OperatorList(*ls.members, Element.mul(element, Element('-1')))
+                break
+
+    while len(find_variables(ls)) < len(ls.members):
+        # if the above condition is true, there are element in ls which do not have variables
+        for element in ls.members:
+            if element.variable.components == {}:
+                # subtracting the element with a variable from both sides
+                rs = OperatorList(*rs.members, Element.mul(element, Element('-1')))
+                ls = OperatorList(*ls.members, Element.mul(element, Element('-1')))
+                break
+
+    if len(ls.members) == 1 and len(rs.members) == 1:
+        divisor = Element(f'{ls.members[0].coefficient}')
+        ls = OperatorList(ls.members[0], divisor, operation='/')
+        rs = OperatorList(rs.members[0], divisor, operation='/')
+
+    return f'{ls.print()} = {rs.print()}'
 
 
 while True:
-    print(solve(input()))
+    print(solve_single_linear_equation(input()))
