@@ -97,13 +97,13 @@ class ExpressionTests(unittest.TestCase):
         self.assertEqual(to_rpn(['5', '+', '2', '^', '3']), [Element('5'), Element('2'), Element('3'), '^', '+'])
 
     def test_all_together_now(self):
-        self.assertEqual(all_together_now("a - b * (2 + 1)"), 'a - 3b')
-        self.assertEqual(all_together_now('ab * b^(3 - 1)'), 'ab^3')
-        self.assertEqual(all_together_now('-8c^5 * 5c^6 * 2c^3'), '-80c^14')
-        self.assertEqual(all_together_now('z * 10z * z * z'), '10z^4')
-        self.assertEqual(all_together_now('-3a^3 * (-4a^5) * (-9a^3)'), '-108a^11')
-        self.assertEqual(all_together_now('3  +  7(3t  +  10)'), '73 + 21t')
-        self.assertEqual(all_together_now('-6(-3n - 1)  +  8(-6  +  9n)'), '90n - 42')
+        self.assertEqual(all_together_now("a - b * (2 + 1)").print(), 'a - 3b')
+        self.assertEqual(all_together_now('ab * b^(3 - 1)').print(), 'ab^3')
+        self.assertEqual(all_together_now('-8c^5 * 5c^6 * 2c^3').print(), '-80c^14')
+        self.assertEqual(all_together_now('z * 10z * z * z').print(), '10z^4')
+        self.assertEqual(all_together_now('-3a^3 * (-4a^5) * (-9a^3)').print(), '-108a^11')
+        self.assertEqual(all_together_now('3  +  7(3t  +  10)').print(), '73 + 21t')
+        self.assertEqual(all_together_now('-6(-3n - 1)  +  8(-6  +  9n)').print(), '90n - 42')
 
         """ self.assertEqual(all_together_now('(-2v^3) / (-10xv^2)'), 'v / (5x)')
             this actually returns : 0.2vx^(-1)
