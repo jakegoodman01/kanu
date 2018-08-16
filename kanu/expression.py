@@ -211,7 +211,3 @@ def all_together_now(expression: str) -> OperatorList:
     ex = to_rpn(ex)
     return to_op_list(ex)
 
-
-if __name__ == '__main__':
-    while True:
-        print(all_together_now(input()))

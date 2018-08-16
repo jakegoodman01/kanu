@@ -47,7 +47,3 @@ def solve_single_linear_equation(equation: str) -> str:
         rs = OperatorList(rs.members[0], divisor, operation='/')
 
     return f'{ls.print()} = {rs.print()}'
-
-
-while True:
-    print(solve_single_linear_equation(input()))

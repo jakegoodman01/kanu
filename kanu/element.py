@@ -224,8 +224,3 @@ class Variable:
         for k in keys_to_add:
             self.components[k] = Element('1')
 
-
-if __name__ == '__main__':
-    e = Element('13')
-    print(e.coefficient)
-    print(e.variable)
