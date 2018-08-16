@@ -1,9 +1,7 @@
-from element import *
+from kanu.element import *
 
 operations = {'+': Element.add, '-': Element.sub, '*': Element.mul, '/': Element.div, '^': Element.pow}
 operator_precedence = {'+': 2, '-': 2, '*': 3, '/': 3, '^': 4}
-
-# TODO: Implement the distributive property
 
 
 class OperatorList:

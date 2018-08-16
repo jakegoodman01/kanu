@@ -1,4 +1,4 @@
-from expression import *
+from kanu.expression import *
 
 
 def find_variables(exp: OperatorList) -> set:
