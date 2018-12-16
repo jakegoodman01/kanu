@@ -40,7 +40,10 @@ class OperatorList:
         self.operation = '+'
 
     def __repr__(self):
-        return f'{self.operation}{self.members}'
+        expression = ''
+        for i in self.members:
+            expression += f'{i} {self.operation} '
+        return expression[:-2]
 
     def __eq__(self, other):
         return self.operation == other.operation and self.members == other.members
