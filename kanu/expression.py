@@ -1,5 +1,8 @@
 from kanu.element import *
 
+# TODO 2x=3x throws IndexError
+# TODO (x+4)/3=4 throws AttributeError
+
 operations = {'+': Element.add, '-': Element.sub, '*': Element.mul, '/': Element.div, '^': Element.pow}
 operator_precedence = {'+': 2, '-': 2, '*': 3, '/': 3, '^': 4}
 
@@ -58,6 +61,14 @@ class OperatorList:
                 else:
                     output.append('+')
                     output.append(repr(self.members[i]))
+
+            # Shave off all decimals past the hundredths column
+            for i in range(len(output)):
+                if '.' in output[i] and len(output[i]) >= output[i].index('.') + 2:
+                    # if output[i] has a decimal, and there are at least two digits after the decimal
+                    output[i] = str(round(float(output[i]), 2))
+                    if float(output[i]) == int(output[i][:output[i].index('.')]):
+                        output[i] = str(int(output[i][:output[i].index('.')]))
             return ' '.join(output)
         else:
             raise ValueError('Cannot print expression')
