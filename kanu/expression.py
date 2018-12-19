@@ -2,6 +2,7 @@ from kanu.element import *
 
 # TODO 2x=3x throws IndexError
 # TODO (x+4)/3=4 throws AttributeError
+# TODO -4(p + 3)/-5 = -7(p+6)/-7 throws AttributeError
 
 operations = {'+': Element.add, '-': Element.sub, '*': Element.mul, '/': Element.div, '^': Element.pow}
 operator_precedence = {'+': 2, '-': 2, '*': 3, '/': 3, '^': 4}
@@ -117,7 +118,7 @@ class OperatorList:
             except ValueError:
                 break
 
-        if self.operation == '*' and len(self.members) == 2:
+        if (self.operation == '*' or self.operation == '/') and len(self.members) == 2:
             """if the preceding condition is true, this OperatorList must be simplified using the distributive
                 property
             """
@@ -129,7 +130,7 @@ class OperatorList:
 
             for i in first.members:
                 for j in second.members:
-                    new_members.append(Element.mul(i, j))
+                    new_members.append(operations[self.operation](i, j))
             self.members = new_members
             self.operation = '+'
             self.simplify()
