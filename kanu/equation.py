@@ -1,6 +1,12 @@
 from kanu.expression import *
 
 
+class NonLinearEquationError(Exception):
+    """ Raised when the given equation is non-linear
+    """
+    pass
+
+
 def find_variables(exp: OperatorList) -> set:
     variables = set()
     for elem in exp.members:
@@ -36,8 +42,15 @@ def solve_single_linear_equation(equation: str) -> str:
                 ls = OperatorList(*ls.members, Element.mul(element, Element('-1')))
                 break
 
+    for elem in ls.members:
+        if elem.variable.components != {}:
+            keys = list(elem.variable.components.keys())
+            for key in keys:
+                if elem.variable.components[key] != Element('1'):
+                    raise NonLinearEquationError()
+
     while len(find_variables(ls)) < len(ls.members):
-        # if the above condition is true, there are element in ls which do not have variables
+        # if the above condition is true, there are elements in ls which do not have variables
         for element in ls.members:
             if element.variable.components == {}:
                 # subtracting the element with a variable from both sides
