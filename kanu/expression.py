@@ -7,6 +7,12 @@ operations = {'+': Element.add, '-': Element.sub, '*': Element.mul, '/': Element
 operator_precedence = {'+': 2, '-': 2, '*': 3, '/': 3, '^': 4}
 
 
+class MismatchedParenthesis(Exception):
+    """This exception is raised when there are mismatched parenthesis in an expression"""
+    def __init__(self):
+        pass
+
+
 class OperatorList:
     def __init__(self, *elements, operation='+'):
         """ Elements is composed of Elements and OperatorLists
