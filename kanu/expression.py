@@ -13,7 +13,7 @@ class InvalidExpressionError(Exception):
         pass
 
 
-class MismatchedParenthesisError(InvalidExpression):
+class MismatchedParenthesisError(InvalidExpressionError):
     """This exception is raised when there are mismatched parenthesis in an expression"""
     def __init__(self):
         pass
