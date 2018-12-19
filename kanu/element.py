@@ -24,7 +24,7 @@ class InvalidElementError(Exception):
         pass
 
 
-class NotValidVariable(Exception):
+class InvalidVariableError(Exception):
     """ This exception is raised when the variable of an expression is a valid number, and the coefficient is 1.
         For example, Element e has coefficient of 1, and variable of 27. They should be flipped because 27 is a valid
         number."""
@@ -42,8 +42,8 @@ class Element:
         if self.coefficient != 0.0:
             try:
                 self.variable = Variable(elem[1])
-            except NotValidVariable as nvv:
-                self.coefficient = nvv.coefficient
+            except InvalidVariableError as ive:
+                self.coefficient = ive.coefficient
                 self.variable = Variable(None)
         else:
             self.variable = Variable(None)
@@ -175,7 +175,7 @@ class Variable:
 
             first_key = list(self.components.keys())[0]
             if len(self.components) == 1 and first_key.isdigit() and self.components[first_key] == Element('1'):
-                raise NotValidVariable(float(list(self.components.keys())[0]))
+                raise InvalidVariableError(float(list(self.components.keys())[0]))
 
     def _parse_variable(self, name: str):
         if name is not None:
