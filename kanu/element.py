@@ -16,6 +16,14 @@ def get_matching_paren(exp: str) -> int:
     return i - 1
 
 
+class InvalidElementError(Exception):
+    """ This exception is raised when an element cannot successfully be created. This may occur if there are mismatched
+        parenthesis, or if a symbol is used that is not recognized by Kanu
+    """
+    def __init__(self):
+        pass
+
+
 class NotValidVariable(Exception):
     """ This exception is raised when the variable of an expression is a valid number, and the coefficient is 1.
         For example, Element e has coefficient of 1, and variable of 27. They should be flipped because 27 is a valid
@@ -27,7 +35,10 @@ class NotValidVariable(Exception):
 class Element:
     def __init__(self, rep: str):
         elem = Element.separate_coefficient(rep)
-        self.coefficient = float(elem[0])
+        try:
+            self.coefficient = float(elem[0])
+        except ValueError as ve:
+            raise InvalidElementError()
         if self.coefficient != 0.0:
             try:
                 self.variable = Variable(elem[1])
