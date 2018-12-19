@@ -7,7 +7,13 @@ operations = {'+': Element.add, '-': Element.sub, '*': Element.mul, '/': Element
 operator_precedence = {'+': 2, '-': 2, '*': 3, '/': 3, '^': 4}
 
 
-class MismatchedParenthesisError(Exception):
+class InvalidExpressionError(Exception):
+    """This exception is raised when an expression is syntactically invalid"""
+    def __init__(self):
+        pass
+
+
+class MismatchedParenthesisError(InvalidExpression):
     """This exception is raised when there are mismatched parenthesis in an expression"""
     def __init__(self):
         pass
@@ -208,6 +214,8 @@ def to_rpn(elements: list) -> list:
 
 def to_op_list(elements: list) -> OperatorList:
     """elements should be a properly written reverse polish notation expression to be made into OperatorLists"""
+    if len(elements) == 0:
+        pass
     new_elements = []
     for e in elements:
         if isinstance(e, Element):
