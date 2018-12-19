@@ -37,7 +37,7 @@ class Element:
         elem = Element.separate_coefficient(rep)
         try:
             self.coefficient = float(elem[0])
-        except ValueError as ve:
+        except ValueError:
             raise InvalidElementError()
         if self.coefficient != 0.0:
             try:

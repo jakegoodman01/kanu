@@ -187,9 +187,9 @@ def to_rpn(elements: list) -> list:
     while i < len(elements):
         token = elements[i]
         try:
-            # If token is not a valid element string, it will raise an exception
+            # If token is not a valid element string, it will raise an InvalidElementError
             output_queue.append(Element(token))
-        except ValueError:
+        except InvalidElementError:
             if token in ('+', '-', '*', '/', '^'):
                 while len(op_stack) > 0 and \
                         op_stack[-1] != '(' \
@@ -215,7 +215,7 @@ def to_rpn(elements: list) -> list:
 def to_op_list(elements: list) -> OperatorList:
     """elements should be a properly written reverse polish notation expression to be made into OperatorLists"""
     if len(elements) == 0:
-        pass
+        raise InvalidExpressionError()
     new_elements = []
     for e in elements:
         if isinstance(e, Element):
