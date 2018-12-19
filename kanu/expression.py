@@ -7,7 +7,7 @@ operations = {'+': Element.add, '-': Element.sub, '*': Element.mul, '/': Element
 operator_precedence = {'+': 2, '-': 2, '*': 3, '/': 3, '^': 4}
 
 
-class MismatchedParenthesis(Exception):
+class MismatchedParenthesisError(Exception):
     """This exception is raised when there are mismatched parenthesis in an expression"""
     def __init__(self):
         pass
@@ -193,8 +193,11 @@ def to_rpn(elements: list) -> list:
             elif token == '(':
                 op_stack.append(token)
             elif token == ')':
-                while op_stack[-1] != '(':
+                while len(op_stack) > 0 and op_stack[-1] != '(':
                     output_queue.append(op_stack.pop())
+
+                if len(op_stack) == 0:
+                    raise MismatchedParenthesisError()
                 op_stack.pop()
         i += 1
 
