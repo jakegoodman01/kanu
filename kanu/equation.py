@@ -58,6 +58,9 @@ def solve_single_linear_equation(equation: str) -> str:
                 ls = OperatorList(*ls.members, Element.mul(element, Element('-1')))
                 break
 
+    if len(ls.members) == 0 and len(rs.members) == 0:
+        return 'There are infinite solutions'
+
     if len(ls.members) == 1 and len(rs.members) == 1:
         divisor = Element(f'{ls.members[0].coefficient}')
         ls = OperatorList(ls.members[0], divisor, operation='/')
