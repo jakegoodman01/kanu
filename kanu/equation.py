@@ -10,8 +10,12 @@ def find_variables(exp: OperatorList) -> set:
 
 def solve_single_linear_equation(equation: str) -> str:
     equal_sign = equation.index('=')
-    ls = all_together_now(equation[:equal_sign])
-    rs = all_together_now(equation[equal_sign + 1:])
+
+    try:
+        ls = all_together_now(equation[:equal_sign])
+        rs = all_together_now(equation[equal_sign + 1:])
+    except (MismatchedParenthesisError, InvalidElementError, InvalidExpressionError):
+        return 'This equation is syntactically invalid!'
 
     ls_vars = find_variables(ls)
     rs_vars = find_variables(rs)
