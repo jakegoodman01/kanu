@@ -1,8 +1,6 @@
 from kanu.element import *
 
 # TODO 2x=3x throws IndexError
-# TODO (x+4)/3=4 throws AttributeError
-# TODO -4(p + 3)/-5 = -7(p+6)/-7 throws AttributeError
 
 operations = {'+': Element.add, '-': Element.sub, '*': Element.mul, '/': Element.div, '^': Element.pow}
 operator_precedence = {'+': 2, '-': 2, '*': 3, '/': 3, '^': 4}
@@ -128,6 +126,7 @@ class OperatorList:
             first = self.members[0] if isinstance(self.members[0], OperatorList) else OperatorList(self.members[0])
             second = self.members[1] if isinstance(self.members[1], OperatorList) else OperatorList(self.members[1])
 
+            # TODO: This works for mul, not div
             for i in first.members:
                 for j in second.members:
                     new_members.append(operations[self.operation](i, j))

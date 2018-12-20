@@ -6,6 +6,7 @@ class EquationTests(unittest.TestCase):
     def test_solve_single_linear_equation(self):
         self.assertEqual(solve_single_linear_equation('x=x'), 'There are infinite solutions')
         self.assertEqual(solve_single_linear_equation(' x   =       x'), 'There are infinite solutions')
+        self.assertEqual(solve_single_linear_equation('4x = 9x'), 'x = 0')
         self.assertRaises(NonLinearEquationError, lambda: solve_single_linear_equation('x^2 = 4'))
         self.assertRaises(NonLinearEquationError, lambda: solve_single_linear_equation('1/x = x'))
         self.assertEqual(solve_single_linear_equation('9x - 15 = 3'), 'x = 2')
