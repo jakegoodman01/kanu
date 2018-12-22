@@ -3,8 +3,8 @@ import kanu
 
 while True:
     print('Select one:')
-    print('\t1) Solve a linear equation')
-    print('\t2) Simplify any expression')
+    print('\t1 -> Solve a linear equation')
+    print('\t2 -> Simplify any expression')
 
     choice = input()
     if choice == '1':
@@ -17,4 +17,6 @@ while True:
     elif choice == '2':
         print('Enter the expression:', end=' ')
         print(kanu.all_together_now(input()))
+    else:
+        print('You must select an option from the menu!')
     print()
